@@ -5,6 +5,7 @@ from src.agents.ai import AI, QLearning, greedy
 from src.agents.human import Human
 from src.game.game import Game
 
+EPOCHS=10000
 
 def main():
     train()
@@ -19,20 +20,17 @@ def main():
 
 
 def play():
-    game = Game([AI('x', greedy), Human()])
+    game = Game([Human(), AI('o', greedy)])
 
-    i = 0
+    print("--- HUMAN VS AI ---")
     while not game.is_over()[0]:
-        if i % 2 == 0:
-            state = QLearning.states.get((hash(game.game_state), 'x'), game.game_state)
-            print(state.move_values)
         print()
         print(game.game_state)
         game.step()
         print()
-        i += 1
 
     print(game.game_state)
+    print()
 
     over,winner = game.is_over()
 
@@ -43,9 +41,8 @@ def play():
 
 
 def train():
-    learning = QLearning(epochs=10000)
+    learning = QLearning(epochs=EPOCHS)
     learning.train()
-    print(len(learning.states))
     # for key in learning.states.keys():
         # print()
         # print(key)

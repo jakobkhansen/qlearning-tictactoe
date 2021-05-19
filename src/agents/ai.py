@@ -120,3 +120,5 @@ class QLearning:
             if ten_percent > 0 and i % ten_percent == 0:
                 print("{} / {} epochs".format(i, self.epochs))
             self.epoch()
+        print("--- TRAINING DONE ---")
+
