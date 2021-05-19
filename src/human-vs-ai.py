@@ -1,3 +1,3 @@
-from .agents import player, ai, human
-from . import game
+from src.agents import player, ai, human
+from src import game
 
