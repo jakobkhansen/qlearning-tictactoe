@@ -1,5 +1,6 @@
-from random import randrange
 from typing import List
+import copy
+import random
 
 
 class BoardState:
@@ -33,10 +34,10 @@ class BoardState:
 
     def random_move(self):
         moves = self.legal_moves()
-        random_index = randrange(len(moves))
-        return moves[random_index]
+        return random.choice(moves)
 
     def execute_move(self, move, player_num):
+        self.board = copy.deepcopy(self.board)
         symbol = ['x', 'o'][player_num]
         x,y = move
         self.board[x][y] = symbol
@@ -100,14 +101,3 @@ def string_to_board(string):
 
 def build_move_values() -> list[list[int]]:
     return [[0]*3 for _ in range(3)]
-
-# test = BoardState(board_string="   x oxxx")
-# print(test)
-# test2 = build_move_values()
-# test2[1][2] = 1
-# print(test2)
-
-# test = BoardState(board_string="   x oxox")
-# print(test)
-# print(test.is_over(0))
-
