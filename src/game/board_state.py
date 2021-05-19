@@ -10,7 +10,7 @@ class BoardState:
         elif board_string != None:
             self.board = string_to_board(board_string)
         else:
-            self.board = string_to_board("         ")
+            self.board = string_to_board("_________")
         self.move_values = build_move_values()
 
 
@@ -26,7 +26,7 @@ class BoardState:
         moves = []
         for i in range(3):
             for j in range(3):
-                if self.board[i][j] == ' ':
+                if self.board[i][j] == '_':
                     moves.append((i,j))
 
         return moves
@@ -41,6 +41,7 @@ class BoardState:
         x,y = move
         self.board[x][y] = symbol
 
+    # Check if game is over or even
     def is_over(self, last_player_num):
         board = self.board
         symbol = ['x', 'o'][last_player_num]
@@ -49,22 +50,29 @@ class BoardState:
         for i in range(3):
             test = [x == symbol for x in [board[i][0], board[i][1], board[i][2]]]
             if all(test):
-                return True
+                return True,True
         # Columns
         for i in range(3):
             test = [x == symbol for x in [board[0][i], board[1][i], board[2][i]]]
             if all(test):
-                return True
+                return True,True
 
         # Diagonals, left-right, right-left
         diagonal1 = [x == symbol for x in [board[0][0], board[1][1], board[2][2]]]
         diagonal2 = [x == symbol for x in [board[2][0], board[1][1], board[0][2]]]
 
         if all(diagonal1) or all(diagonal2):
-            return True
+            return True,True
 
-        # No row, column or diagonal is complete
-        return False
+        # No row, column or diagonal is complete, check if draw
+        for row in board:
+            for symbol in row:
+                if symbol == '_':
+                    return False,False
+        return True,False
+
+
+    
 
     def __hash__(self) -> int:
         string = board_to_string(self.board)

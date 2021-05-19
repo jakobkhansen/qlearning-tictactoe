@@ -7,7 +7,9 @@ class Game:
     def __init__(self, players) -> None:
         self.players = players
         self.game_state = BoardState()
+        print(self.game_state)
         self.current_player = 0
+        self.winner = None
 
     def step(self):
         old_state = self.game_state
@@ -15,7 +17,7 @@ class Game:
         self.game_state.execute_move(move, self.current_player)
         new_state = self.game_state
 
-        if not self.is_over():
+        if not self.is_over()[0]:
             self.switch_player()
 
         return old_state,move,new_state
@@ -26,7 +28,11 @@ class Game:
         self.current_player = (self.current_player + 1) % 2
 
     def is_over(self):
-        return self.game_state.is_over(self.current_player)
+        over,winner = self.game_state.is_over(self.current_player)
+        return over,winner
 
     def get_current_player(self):
         return self.current_player
+
+    def get_winner(self):
+        return self.winner

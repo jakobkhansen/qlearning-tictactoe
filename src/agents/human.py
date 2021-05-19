@@ -9,4 +9,4 @@ class Human(Player):
         pass
 
 def take_input():
-    pass
+    move = [int(x) for x in input().split()]

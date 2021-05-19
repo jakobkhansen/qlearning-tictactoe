@@ -4,7 +4,7 @@ from src.agents.ai import QLearning
 
 
 def main():
-    qlearning = QLearning()
+    qlearning = QLearning(epochs=1)
     qlearning.train()
 
 if __name__ == "__main__":
