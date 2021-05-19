@@ -27,3 +27,7 @@ MOVE: 0
 Since the AI learns by playing against itself, the code can be a bit unclean at certain
 points, this is because the two AI's need to learn from each others wins and losses. This
 was something I realised too late.
+
+The AI plays close to perfect with the default settings, there might be edge-cases that it
+doesn't encounter while training. The chance of this happening could be decreased with
+more epochs, which can be modified in `human-vs.ai.py`.
