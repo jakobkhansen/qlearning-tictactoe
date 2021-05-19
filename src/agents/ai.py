@@ -1,9 +1,10 @@
 import math
 import random
 from src.game.game import Game
-from src.game.board_state import BoardState, board_to_string
+from src.game.board_state import BoardState
 
-REWARD_WIN = 1000
+REWARD_WIN = 1
+REWARD_LOSE = -1
 REWARD_MOVE = 0
 
 class AI:
@@ -23,7 +24,7 @@ def random_policy(board_in, symbol):
 
 def epsilon_greedy(board_in, symbol):
     board : BoardState = QLearning.states.get((hash(board_in), symbol), board_in)
-    epsilon = 0.5
+    epsilon = 0.3
 
     chance = random.uniform(0, 1)
 
@@ -55,41 +56,58 @@ class QLearning:
     def epoch(self):
         game = Game([self.ai1, self.ai2])
         i = 0
-        # print("NEW GAME")
+        last_old_state = None
+        last_move = None
+        
         while not game.is_over()[0]:
             curr_ai = [self.ai1, self.ai2][game.current_player]
+
             old_state, move, new_state = game.step()
             other_ai = [self.ai1, self.ai2][game.current_player]
-
-            # if board_to_string(old_state.board) == '_________':
-                # print("yes")
-                # print((hash(new_state), other_ai.symbol) in QLearning.states)
-
 
             old_state = QLearning.states.get((hash(old_state), curr_ai.symbol), old_state)
             new_state = QLearning.states.get((hash(new_state), other_ai.symbol), new_state)
 
+
             over, won = game.is_over()
             if over and won:
-                reward = REWARD_WIN
+                reward_curr = REWARD_WIN
+                reward_other = REWARD_LOSE
             else:
-                reward = REWARD_MOVE
+                reward_curr = REWARD_MOVE
+                reward_other = REWARD_MOVE
 
-            old_value = old_state.move_values[move[0]][move[1]]
-            future = self.get_potential_future_reward(new_state)
-            discount = self.gamma**i
+            self.update_player(old_state, move, new_state, curr_ai.symbol, reward_curr, i)
 
-            learned = self.eta*(reward+discount*future - old_value)
-            old_state.move_values[move[0]][move[1]] = old_value + learned
+            if last_old_state != None and last_move != None:
+                self.update_player(last_old_state, last_move, None, other_ai.symbol, reward_other, i-1)
 
-            QLearning.states[(hash(old_state), curr_ai.symbol)] = old_state  
+            
+            last_old_state = old_state
+            last_move = move
 
-            # start_state = BoardState(board_string="_________")
-            # start = QLearning.states.get((hash(start_state), 'x'), None)
-            # if start is not None:
-                # print(start.move_values)
+            # print("Reward first")
+            # print(reward_curr)
+            # print("Reward last")
+            # print(reward_other)
+            # print("New")
+            # print(new_state.move_values)
+            # print()
 
             i += 1
+
+    def update_player(self, old_state, move, new_state, symbol, reward, discount_exp):
+        if new_state == None:
+            future = 0
+        else:
+            future = self.get_potential_future_reward(new_state)
+        old_value = old_state.move_values[move[0]][move[1]]
+        discount = self.gamma**discount_exp
+
+        learned = self.eta*(reward+discount*future - old_value)
+        old_state.move_values[move[0]][move[1]] = old_value + learned
+
+        QLearning.states[(hash(old_state), symbol)] = old_state  
     
     def get_potential_future_reward(self, new_state):
         return max([max(x) for x in new_state.move_values])
@@ -97,9 +115,8 @@ class QLearning:
 
     def train(self):
         print("--- TRAINING ---")
-        print("0% done")
         ten_percent = math.floor(self.epochs / 10)
         for i in range(self.epochs):
-            if i % ten_percent == 0:
-                print("{}% done".format(str(100/(self.epochs-i)*100)))
+            if ten_percent > 0 and i % ten_percent == 0:
+                print("{} / {} epochs".format(i, self.epochs))
             self.epoch()

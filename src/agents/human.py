@@ -12,7 +12,7 @@ class Human:
         return (x,y)
 
 def take_input():
-    return [int(x) for x in input().split()]
+    return [int(x) for x in input("Move: ").split()]
 
 def move_in_range(move):
     x,y = move
